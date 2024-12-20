@@ -1,4 +1,4 @@
-FROM gitpod/workspace-full
+FROM gitpod/workspace-base
 
 
 COPY c.kdbx $HOME
@@ -19,7 +19,7 @@ jars=(
     cd "${jdbc_drivers_dir}"
     for jar in "${jars[@]}"; do {
       curl -LO "${jar}"
-    }
+    } done
   )
 
 databaseDrivers_xml="$(
