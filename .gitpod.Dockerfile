@@ -1,7 +1,6 @@
 FROM gitpod/workspace-base
 
 
-COPY c.kdbx $HOME
 SHELL ["/bin/bash", "-c"]
 RUN <<EOR
 set -eu
@@ -47,16 +46,20 @@ printf '%s\n' '*:*:*:*:mysecretpassword' > "${HOME}/.pgpass"
 # This may work for other DBs too, commment it out if not needed. For postgres, pgpass is simpler
 sudo tee -a /etc/bash.bashrc <<'BASH'
 
-if mkdir /tmp/.jdbc.lock 2>/dev/null; then
+if test -v JETBRAINS_GITPOD_BACKEND_KIND && mkdir /tmp/.jdbc.lock 2>/dev/null; then
   (
-      until test -e /workspace/.gitpod/ready; do
+#      until test -e /workspace/.gitpod/ready; do
+#        sleep 1
+#      done
+
+      shopt -s nullglob
+      until ides=(/workspace/.config/JetBrains/RemoteDevv-*) && test -n "${ides:-}"; do
         sleep 1
       done
-
-      target_dir="/workspace/.config/JetBrains/RemoteDev-IU"
-      mkdir -p "$target_dir"
-      for f in "${$GITPOD_REPO_ROOT}/.idea/keepass"/*; do
-        ln -sf "${f}" "${target_dir}"
+      for ide in "${ides[@]}"; do
+          for f in "${GITPOD_REPO_ROOT}/.idea/keepass"/*; do
+            ln -sf "${f}" "${ide}"
+          done
       done
   ) & disown
 fi
