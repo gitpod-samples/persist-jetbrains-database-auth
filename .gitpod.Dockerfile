@@ -38,12 +38,17 @@ databaseDrivers_xml="$(
 )"
 printf "%s\n" "${databaseDrivers_xml}" > "${jb_options_dir}/databaseDrivers.xml"
 
-# For postgres, pgpass
-## Format = hostname:port:database:username:password
+# For postgres, pgpass is a simple solution, you can pick this auth method in the db connection
+## You may add more static entries here as necessary
 ## You can use wildcards (*) for any field except password
-printf '%s\n' '*:*:*:*:mysecretpassword' > "${HOME}/.pgpass"
+## Format = hostname:port:database:username:password
+## See https://www.postgresql.org/docs/current/libpq-pgpass.html for more
+cat >> "${HOME}/.pgpass" <<'PGPASS'
+*:*:*:*:mysecretpassword
 
-# This may work for other DBs too, commment it out if not needed. For postgres, pgpass is simpler
+PGPASS
+
+# Keepass method should work for all DBs, commment it out if not needed. For postgres, pgpass is simpler
 sudo tee -a /etc/bash.bashrc <<'BASH'
 
 if test -v JETBRAINS_GITPOD_BACKEND_KIND && mkdir /tmp/.jdbc.lock 2>/dev/null; then
