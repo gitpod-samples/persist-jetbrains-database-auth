@@ -1,2 +1,6 @@
 image:
   file: .gitpod.Dockerfile
+
+tasks:
+  - name: Start a dummy postgres server
+    command: docker run --rm --net=host --name some-postgres -e POSTGRES_PASSWORD=mysecretpassword postgres

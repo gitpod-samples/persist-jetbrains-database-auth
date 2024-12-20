@@ -37,19 +37,28 @@ databaseDrivers_xml="$(
                    </component>
                  </application>'
 )"
-
 printf "%s\n" "${databaseDrivers_xml}" > "${jb_options_dir}/databaseDrivers.xml"
 
+# For postgres, pgpass
+## Format = hostname:port:database:username:password
+## You can use wildcards (*) for any field except password
+printf '%s\n' '*:*:*:*:mysecretpassword' > "${HOME}/.pgpass"
+
+# This may work for other DBs too, commment it out if not needed. For postgres, pgpass is simpler
 sudo tee -a /etc/bash.bashrc <<'BASH'
 
 if mkdir /tmp/.jdbc.lock 2>/dev/null; then
-#  until test -e /workspace/.gitpod/ready; do
-#    sleep 1
-#  done
+  (
+      until test -e /workspace/.gitpod/ready; do
+        sleep 1
+      done
 
-  target_dir="/workspace/.config/JetBrains/RemoteDev-IU"
-  mkdir -p "$target_dir"
-  cp /home/gitpod/c.kdbx "${target_dir}"
+      target_dir="/workspace/.config/JetBrains/RemoteDev-IU"
+      mkdir -p "$target_dir"
+      for f in "${$GITPOD_REPO_ROOT}/.idea/keepass"/*; do
+        ln -sf "${f}" "${target_dir}"
+      done
+  ) & disown
 fi
 
 BASH
