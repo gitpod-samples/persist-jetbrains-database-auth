@@ -4,3 +4,6 @@ image:
 tasks:
   - name: Start a dummy postgres server
     command: docker run --rm --net=host --name some-postgres -e POSTGRES_PASSWORD=mysecretpassword postgres
+
+  - name: Import data
+    command: gp ports await 5432 && sleep 2 && docker exec -i some-postgres psql -U postgres < data.sql
